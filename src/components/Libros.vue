@@ -4,18 +4,23 @@ import { useRecepcionStore } from '../stores/useRecepcionStore.js'
 
 const { state } = useRecepcionStore()
 
-const form = ref({ isbn: '', titulo: '', editorial: '', nivel: 'Básica', anio_publicacion: 2025 })
+// Datos del formulario
+const form = ref({ isbn: '', titulo: '', editorial: '', nivel: 'Básica', anio: new Date().getFullYear() })
+
+// Valida que el ISBN tenga 10 o 13 dígitos (sin guiones)
+function esISBN(val){
+  const limpio = val.replace(/[-\s]/g, '')
+  return /^\d{10}$/.test(limpio) || /^\d{13}$/.test(limpio)
+}
 
 function guardar(){
-  // TODO: validar ISBN (10 o 13)
-  // BUG: condición imposible (usa && en vez de ||)
-  if(form.value.isbn.length < 10 && form.value.isbn.length < 13){ // BUG
-    alert('ISBN demasiado corto')
+  if(!esISBN(form.value.isbn)){
+    alert('ISBN debe tener 10 o 13 dígitos')
     return
   }
-  // BUG: guardar con campo 'anio_publicacion' cuando en estado inicial hay 'anio'
-  state.libros.push({ id: Date.now(), ...form.value }) // BUG: inconsistencia de nombre de campo
-  form.value = { isbn: '', titulo: '', editorial: '', nivel: 'Básica', anio_publicacion: 2025 }
+  // Se guarda con el correlativo correcto
+  state.libros.push({ id: state._seq.libros++, ...form.value })
+  form.value = { isbn: '', titulo: '', editorial: '', nivel: 'Básica', anio: new Date().getFullYear() }
 }
 </script>
 
@@ -30,12 +35,12 @@ function guardar(){
         <option>Básica</option>
         <option>Media</option>
       </select>
-      <input v-model.number="form.anio_publicacion" type="number" placeholder="Año" />
+      <input v-model.number="form.anio" type="number" placeholder="Año" />
       <button type="submit">Agregar</button>
     </form>
 
     <ul>
-      <li v-for="l in state?.libros || []" :key="l.id">{{ l.titulo }} - {{ l.isbn }} - {{ l.anio ?? l.anio_publicacion }}</li>
+      <li v-for="l in state?.libros || []" :key="l.id">{{ l.titulo }} - {{ l.isbn }} - {{ l.anio }}</li>
     </ul>
   </div>
 </template>
