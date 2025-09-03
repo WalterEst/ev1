@@ -1,9 +1,11 @@
 // Store central con persistencia en localStorage
 import { reactive, watch } from 'vue'
 
+// Clave única para aislar los datos del resto de la plataforma
 const KEY = 'recepcion-store'
 
 // Estructura inicial de datos
+// Definir valores de ejemplo facilita las pruebas y sirve como documentación viva
 const defaults = {
   proveedores: [
     { id: 1, nombre: 'Editorial Santillana', rut: '76.123.456-7', contacto: 'soporte@santillana.cl' }
@@ -21,14 +23,17 @@ const defaults = {
 }
 
 // Cargamos desde localStorage o usamos los valores por defecto
+// `reactive` se usa para evitar dependencias adicionales como Pinia manteniendo reactividad
 const state = reactive(JSON.parse(localStorage.getItem(KEY) || 'null') || defaults)
 
 // Guarda el estado ante cualquier cambio profundo
+// `deep: true` garantiza que incluso cambios anidados se sincronicen
 watch(state, val => {
   localStorage.setItem(KEY, JSON.stringify(val))
 }, { deep: true })
 
 // Hook de acceso al estado
+// Exponerlo como función permite reusar la misma instancia en toda la app
 export function useRecepcionStore(){
   return { state }
 }
