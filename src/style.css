@@ -58,6 +58,8 @@ button:focus-visible {
   padding: 2em;
 }
 
+.error{color:#dc2626}
+
 #app {
   max-width: 1280px;
   margin: 0 auto;
